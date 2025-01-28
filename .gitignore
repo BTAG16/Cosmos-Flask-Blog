@@ -5,6 +5,9 @@
 .vscode
 *.json
 
+# Ignore instance folder (contains sensitive data)
+instance/
+
 ### Also any macOS specific files
 .DS_Store
 .AppleDouble
