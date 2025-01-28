@@ -1,7 +1,11 @@
+import os
 from datetime import date
+from email.message import Message
 from functools import wraps
 
 from flask import Flask, abort, render_template, redirect, url_for, flash, request, session
+from dotenv import load_dotenv
+from flask_mail import Mail, Message
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
@@ -11,10 +15,12 @@ from sqlalchemy import Integer, String, Text
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, ContactForm
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key')
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
@@ -27,10 +33,20 @@ gravatar = Gravatar(app,
                     use_ssl=False,
                     base_url=None)
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = os.environ["EMAIL"]
+app.config['MAIL_PASSWORD'] = os.environ["PASSWORD"]
+app.config['MAIL_DEFAULT_SENDER'] = os.environ["EMAIL"]
+
+mail = Mail(app)
+
 class Base(DeclarativeBase):
     pass
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///posts.db')
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -222,9 +238,32 @@ def about():
         flash("You have to Login to view Content")
         return redirect(url_for('login'))
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html")
+    contact_form = ContactForm()
+    if contact_form.validate_on_submit():
+        name = contact_form.name.data
+        c_email = contact_form.email.data
+        phone = contact_form.phone.data
+        message = contact_form.message.data
+
+        msg = Message(
+            subject=f"Blog Message! From {name}",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
+            recipients=["cosmosjnr@icloud.com"],
+            html=f"<strong>Name:</strong> {name}<br>"
+                 f"<strong>Phone Number:</strong> {phone}<br>"
+                 f"<strong>Email:</strong> {c_email}<br><br>"
+                 f"<strong>Message:</strong><br>{message}"
+        )
+
+        try:
+            mail.send(msg)
+            return render_template("contact.html", form=contact_form, msg_sent=True)
+        except Exception as e:
+            flash(f'An error occurred while sending the email: {e}', 'danger')
+
+    return render_template("contact.html", form=contact_form)
 
 if __name__ == "__main__":
     app.run(debug=True)

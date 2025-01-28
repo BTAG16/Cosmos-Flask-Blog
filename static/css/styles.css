@@ -10857,3 +10857,69 @@ header.masthead .post-heading .meta a {
   color: #ee6f57;
   text-align: center;
 }
+
+.card-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 50vh;
+      margin-top: 30px;
+  }
+
+  .card {
+      width: 500px;
+      height: 100%;
+      perspective: 1000px;
+  }
+
+  .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      transition: transform 0.6s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Card Front */
+  .card-front {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      text-align: center;
+      transform: rotateY(0deg);
+  }
+
+  .card-front h3 a {
+      text-decoration: none;
+      color: #fff;
+  }
+
+  .card-front h3 a:hover {
+      text-decoration: underline;
+  }
+
+  /* Card Back */
+  .card-back {
+      background: #000; /* Black background */
+      transform: rotateY(180deg); /* Starts hidden */
+  }
+
+  .card-back img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+  }
+
+  /* Flip Effect: Hover */
+  .card-container:hover .card-front {
+      transform: rotateY(-180deg); /* Flip front out */
+  }
+
+  .card-container:hover .card-back {
+      transform: rotateY(0deg); /* Bring back into view */
+  }
