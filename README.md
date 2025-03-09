@@ -14,7 +14,7 @@ Welcome to **Cosmos' Blog**, a personal blogging platform built with **Flask**, 
 ---
 
 ## 🌐 Live Demo  
-Check out the live version of the site: [Cosmos' Blog](https://cosmos-blog.onrender.com/)
+Check out the live version of the site: [Cosmos' Blog](https://cosmos-flask-blog-2.onrender.com/)
 
 ---
 
